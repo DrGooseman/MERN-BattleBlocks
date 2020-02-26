@@ -12,6 +12,22 @@ code {
     monospace;
 }
 
+h1 {
+  font-size: 4vh;
+}
+
+h2 {
+  /* font-size: 2em; */
+  /* font-size: 200%; */
+  font-size: 3.4vh;
+  margin-bottom: 0;
+}
+h3 {
+  /* font-size: 1.7em; */
+  /* font-size: 170%; */
+  font-size: 3vh;
+  margin-bottom: 0;
+}
 .container2 {
   height: 100vh;
   width: 100vh;
@@ -19,7 +35,8 @@ code {
 }
 
 .game-area {
-  background-color: blue;
+  /* background-color: blue; */
+  background-color: #2196f3;
   grid-area: game-area;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -39,7 +56,7 @@ code {
 }
 
 .side-area {
-  background-color: green;
+  background-color: #0083ee;
   grid-area: side-area;
 }
 
@@ -51,7 +68,8 @@ code {
     "side-area game-area game-area game-area"
     "side-area block-area block-area block-area";
   grid-gap: 10px;
-  background-color: #2196f3;
+
+  background-color: blue;
   padding: 10px;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
@@ -63,6 +81,26 @@ code {
 
 .block {
   background: tan;
+  display: grid;
+  grid-gap: 4px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  text-align: center;
+}
+.block.selected {
+  background: yellow;
+}
+.block.yours {
+  background: green;
+}
+.block.theirs {
+  background: red;
+}
+.yours .block-direction {
+  background: rgb(65, 141, 65);
+}
+.theirs .block-direction {
+  background: #ff4040;
 }
 
 /* .grid-container > div {
