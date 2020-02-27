@@ -87,14 +87,15 @@ h3 {
   grid-template-rows: repeat(3, 1fr);
   text-align: center;
 }
-.block.selected {
-  background: yellow;
-}
+
 .block.yours {
   background: green;
 }
 .block.theirs {
   background: red;
+}
+.block.selected {
+  background: yellow;
 }
 .yours .block-direction {
   background: rgb(65, 141, 65);

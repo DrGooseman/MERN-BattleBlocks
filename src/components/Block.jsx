@@ -3,7 +3,8 @@ import React from "react";
 function Block(props) {
   return (
     <div
-      className={"block " + props.owner}
+      className={"block " + props.owner + (props.isSelected ? " selected" : "")}
+      onClick={() => props.handleClick(props.id)}
       style={{
         gridArea:
           "" +
