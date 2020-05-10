@@ -11,7 +11,7 @@ function getBlockAreaPosition(power) {
   }
   col = power - 1;
 
-  return [col, row];
+  return { x: col, y: row };
 }
 
 function mapBlocks() {
@@ -37,11 +37,11 @@ function GameBoard(props) {
   function initializeBoard() {
     yourBlocks.forEach((block) => {
       if (block.position && block.power > 0)
-        boardArray[block.position[1]][block.position[0]] = block;
+        boardArray[block.position.y][block.position.x] = block;
     });
     theirBlocks.forEach((block) => {
       if (block.position && block.power > 0)
-        boardArray[block.position[1]][block.position[0]] = block;
+        boardArray[block.position.y][block.position.x] = block;
     });
 
     // for (var i = 0; i < 5; i++){
@@ -62,7 +62,7 @@ function GameBoard(props) {
     if (boardArray[y][x] && !selectedBlock) return;
 
     boardArray[y][x] = selectedBlock;
-    selectedBlock.position = [x, y];
+    selectedBlock.position = { x, y };
 
     setSelectedBlock(null);
   }

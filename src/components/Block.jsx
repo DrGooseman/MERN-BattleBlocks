@@ -1,8 +1,8 @@
 import React from "react";
 
 function Block(props) {
-  const x = props.position[0];
-  const y = props.position[1];
+  const x = props.position.x;
+  const y = props.position.y;
 
   return (
     <div

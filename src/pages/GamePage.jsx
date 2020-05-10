@@ -12,7 +12,7 @@ const yourBlocks = [
   {
     id: 4,
     power: 4,
-    position: [0, 1],
+    position: { x: 1, y: 0 },
     directions: [false, true, false, false, false, true, false, true],
   },
   {
@@ -44,7 +44,7 @@ const theirBlocks = [
   {
     id: 2,
     power: 2,
-    position: [1, 2],
+    position: { x: 2, y: 1 },
     directions: [true, false, true, false, true, false, true, false],
   },
   {
@@ -56,7 +56,7 @@ const theirBlocks = [
   {
     id: 7,
     power: 7,
-    position: [3, 3],
+    position: { x: 3, y: 3 },
     directions: [false, false, true, false, false, true, false, true],
   },
 ];
