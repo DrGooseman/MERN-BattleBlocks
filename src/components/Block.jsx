@@ -1,20 +1,16 @@
 import React from "react";
 
 function Block(props) {
+  const x = props.position[0];
+  const y = props.position[1];
+
   return (
     <div
       className={"block " + props.owner + (props.isSelected ? " selected" : "")}
       onClick={() => props.handleClick(props.id)}
       style={{
         gridArea:
-          "" +
-          (props.position[0] + 1) +
-          " / " +
-          (props.position[1] + 1) +
-          " / " +
-          (props.position[0] + 2) +
-          " / " +
-          (props.position[1] + 2)
+          "" + (y + 1) + " / " + (x + 1) + " / " + (y + 2) + " / " + (x + 2),
       }}
     >
       {props.directions[0] && (
