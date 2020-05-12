@@ -32,6 +32,7 @@ const gameSchema = new mongoose.Schema({
   turn: Number,
   state: Number,
   playersState: [Number],
+  winner: Number,
 });
 
 const Game = new mongoose.model("Game", gameSchema);

@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+
 import OpenGames from "../components/OpenGames";
 import GameBoard from "./../components/GameBoard";
+import PlayerHeading from "../components/PlayerHeading";
+
+import { AuthContext } from "../auth-context";
+import { connectToSocket } from "../api";
+import { disconnect } from "../api";
 
 const yourBlocks = [
   {
@@ -83,16 +89,43 @@ const openGames = [
 ];
 
 function GamePage() {
+  const auth = useContext(AuthContext);
   const [currentGame, setCurrentGame] = useState(null);
 
   function selectGame(newGameId) {
     setCurrentGame(openGames.find((game) => game._id === newGameId));
   }
 
+  function handleLogout() {
+    disconnect();
+    auth.logout();
+  }
+
+  useEffect(() => {
+    if (auth.username) connectToSocket(auth.username, receiveIncomingUpdate);
+  }, [auth.username]);
+
+  function receiveIncomingUpdate(err, updatedGame) {
+    // setLastUpdatedChat(updatedChat);
+    // setChats(prevChats => {
+    //   const newChats = [
+    //     ...prevChats.filter(chat => chat._id !== updatedChat._id),
+    //     updatedChat
+    //   ];
+    //   sortChats(newChats);
+    //   return newChats;
+    // });
+  }
+
   return (
     <div className="container2 grid-container">
       <div className="side-area">
         <h1>Battle Blocks</h1>
+        <PlayerHeading
+          username={auth.username}
+          pic={process.env.REACT_APP_ASSET_URL + auth.picture}
+          handleLogout={handleLogout}
+        />
         {openGames.map((game) => (
           <OpenGames
             key={game._id}

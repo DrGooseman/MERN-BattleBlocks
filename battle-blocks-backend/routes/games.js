@@ -6,13 +6,13 @@ const router = express.Router();
 
 const fileUpload = require("../middleware/file-upload");
 const HttpError = require("../models/http-error");
-const {createNewGame} = require("../util/GameUtil");
+const { createNewGame } = require("../util/GameUtil");
 
 router.get("/", auth, async (req, res, next) => {
   const userGames = await Chat.find({
     users: {
       $elemMatch: {
-        _id: req.user._id
+        _id: req.user._id,
         //username: req.user.username,
       },
     },
@@ -24,12 +24,13 @@ router.get("/", auth, async (req, res, next) => {
 router.post("/", auth, async (req, res, next) => {
   const usersInGame = req.body.users;
 
-  const newGame;
-  try{
+  let newGame;
+
+  try {
     newGame = createNewGame(usersInGame);
-    } catch (err) {
-      return next(new HttpError("Could not create game, invalid input.", 400));
-    }
+  } catch (err) {
+    return next(new HttpError("Could not create game, invalid input.", 400));
+  }
 
   try {
     newGame.save();
