@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Block from "../components/Block";
 import EmptyBlock from "./EmptyBlock";
+
+import { AuthContext } from "../auth-context";
 
 function getBlockAreaPosition(power) {
   let row = 0;
@@ -25,14 +27,38 @@ function mapBlocks() {
 }
 
 function GameBoard(props) {
-  const { yourBlocks, theirBlocks } = props;
+  const auth = useContext(AuthContext);
+
+  const { game } = props;
+  // let playerNum;
+  // let otherPlayerNum;
+  // const yourBlocks = [];
+  // const theirBlocks = [];
   // const [currentGame, setCurrentGame] = useState(null);
+  const [yourBlocks, setYourBlocks] = useState(null);
+  const [theirBlocks, setTheirBlocks] = useState(null);
+  const [playerNum, setPlayerNum] = useState(null);
+  const [otherPlayerNum, setOtherPlayerNum] = useState(null);
   const [selectedBlock, setSelectedBlock] = useState(null);
   const boardArray = [[], [], [], [], []];
 
   useEffect(() => {
+    let yourNum;
+    let theirNum;
+    if (game.users[0]._id === auth._id) {
+      yourNum = 0;
+      theirNum = 1;
+    } else {
+      yourNum = 1;
+      theirNum = 0;
+    }
+    setPlayerNum(yourNum);
+    setOtherPlayerNum(theirNum);
+    setYourBlocks(game.playersBlocks[yourNum]);
+    setTheirBlocks(game.playersBlocks[theirNum]);
+
     initializeBoard();
-  }, []);
+  }, [game]);
 
   function initializeBoard() {
     yourBlocks.forEach((block) => {

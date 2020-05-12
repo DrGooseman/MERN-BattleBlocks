@@ -29,6 +29,7 @@ const gameSchema = new mongoose.Schema({
     position: { x: Number, y: Number },
     directions: [Boolean],
   },
+  lastMoveDate: Date,
   turn: Number,
   state: Number,
   playersState: [Number],

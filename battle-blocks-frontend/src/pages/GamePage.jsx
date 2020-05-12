@@ -3,94 +3,19 @@ import React, { useState, useContext, useEffect } from "react";
 import OpenGames from "../components/OpenGames";
 import GameBoard from "./../components/GameBoard";
 import PlayerHeading from "../components/PlayerHeading";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 
+import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../auth-context";
 import { connectToSocket } from "../api";
 import { disconnect } from "../api";
 
-const yourBlocks = [
-  {
-    id: 2,
-    power: 2,
-    position: null,
-    directions: [true, false, true, false, true, false, true, false],
-  },
-  {
-    id: 4,
-    power: 4,
-    position: { x: 1, y: 0 },
-    directions: [false, true, false, false, false, true, false, true],
-  },
-  {
-    id: 5,
-    power: 5,
-    position: null,
-    directions: [true, false, true, false, true, false, true, false],
-  },
-  {
-    id: 6,
-    power: 6,
-    position: null,
-    directions: [true, false, true, false, true, false, true, false],
-  },
-  {
-    id: 9,
-    power: 9,
-    position: null,
-    directions: [false, false, false, true, false, false, true, false],
-  },
-  {
-    id: 10,
-    power: 10,
-    position: null,
-    directions: [false, false, true, false, false, false, false, false],
-  },
-];
-const theirBlocks = [
-  {
-    id: 2,
-    power: 2,
-    position: { x: 2, y: 1 },
-    directions: [true, false, true, false, true, false, true, false],
-  },
-  {
-    id: 4,
-    power: 4,
-    position: null,
-    directions: [false, true, false, false, false, true, false, true],
-  },
-  {
-    id: 7,
-    power: 7,
-    position: { x: 3, y: 3 },
-    directions: [false, false, true, false, false, true, false, true],
-  },
-];
-
-const openGames = [
-  {
-    _id: 0,
-    players: ["Joe"],
-    state: 0,
-    lastMoveDate: "Apr 12 17:41",
-  },
-  {
-    _id: 1,
-    players: ["Billy"],
-    state: 1,
-    lastMoveDate: "Apr 12 12:10",
-  },
-  {
-    _id: 2,
-    players: ["Artyem"],
-    state: 2,
-    lastMoveDate: "Apr 13 09:41",
-  },
-];
-
 function GamePage() {
   const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [currentGame, setCurrentGame] = useState(null);
+  const [openGames, setOpenGames] = useState(null);
 
   function selectGame(newGameId) {
     setCurrentGame(openGames.find((game) => game._id === newGameId));
@@ -117,6 +42,38 @@ function GamePage() {
     // });
   }
 
+  async function getOpenGames() {
+    try {
+      const responseData = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/games",
+        "GET",
+        null,
+        {
+          "Content-Type": "application/json",
+          Authorization: auth.token,
+        }
+      );
+
+      let games = responseData.games;
+
+      sortGames(games);
+
+      setOpenGames(games);
+
+      // getQuestion();
+    } catch (err) {}
+  }
+
+  function sortGames(games) {
+    games.sort((a, b) =>
+      new Date(a.lastMoveDate) > new Date(b.lastMoveDate)
+        ? -1
+        : new Date(b.lastMoveDate) > new Date(a.lastMoveDate)
+        ? 1
+        : 0
+    );
+  }
+
   return (
     <div className="container2 grid-container">
       <div className="side-area">
@@ -126,19 +83,34 @@ function GamePage() {
           pic={process.env.REACT_APP_ASSET_URL + auth.picture}
           handleLogout={handleLogout}
         />
-        {openGames.map((game) => (
-          <OpenGames
-            key={game._id}
-            isActive={currentGame && game._id === currentGame._id}
-            name={game.players[0]}
-            lastMessage={game.state}
-            lastMessageDate={game.lastMoveDate}
-            pic="https://picsum.photos/24"
-            handleClick={() => selectGame(game._id)}
-          />
-        ))}
+        {openGames &&
+          openGames.map((game) => (
+            <OpenGames
+              key={game._id}
+              isActive={currentGame && game._id === currentGame._id}
+              name={game.players[0]}
+              lastMessage={game.state}
+              lastMessageDate={game.lastMoveDate}
+              pic="https://picsum.photos/24"
+              handleClick={() => selectGame(game._id)}
+            />
+          ))}
+        {!openGames && "No open games."}
+        {error && (
+          <Alert variant="danger" onClose={clearError} dismissible>
+            <Alert.Heading>An error has occured :(</Alert.Heading>
+            <p>{error}</p>
+          </Alert>
+        )}
+        {isLoading && (
+          <div className="center-items-flex">
+            <Spinner animation="border" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
+        )}
       </div>
-      <GameBoard yourBlocks={yourBlocks} theirBlocks={theirBlocks} />
+      {currentGame && <GameBoard game={currentGame} />}
     </div>
   );
 }

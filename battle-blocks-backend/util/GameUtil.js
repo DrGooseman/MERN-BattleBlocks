@@ -9,6 +9,7 @@ function createNewGame(users) {
     playersBlocks: [player1Blocks, player2Blocks],
     previousPlayersBlocks: null,
     lastMove: null,
+    lastMoveDate: new Date(),
     turn: 0,
     state: 0,
     playersState: [1, 0],
