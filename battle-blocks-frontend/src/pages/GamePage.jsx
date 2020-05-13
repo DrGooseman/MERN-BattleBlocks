@@ -10,12 +10,14 @@ import { useHttpClient } from "../hooks/http-hook";
 import { AuthContext } from "../auth-context";
 import { connectToSocket } from "../api";
 import { disconnect } from "../api";
+import NewGameModal from "../components/NewGameModal";
 
 function GamePage() {
   const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [currentGame, setCurrentGame] = useState(null);
   const [openGames, setOpenGames] = useState(null);
+  const [showingNewGameModal, setShowingNewGameModal] = useState(false);
 
   function selectGame(newGameId) {
     setCurrentGame(openGames.find((game) => game._id === newGameId));
@@ -74,6 +76,10 @@ function GamePage() {
     );
   }
 
+  function handleCreateGame(game) {
+    setCurrentGame(game);
+  }
+
   return (
     <div className="container2 grid-container">
       <div className="side-area">
@@ -83,19 +89,22 @@ function GamePage() {
           pic={process.env.REACT_APP_ASSET_URL + auth.picture}
           handleLogout={handleLogout}
         />
-        {openGames &&
-          openGames.map((game) => (
-            <OpenGames
-              key={game._id}
-              isActive={currentGame && game._id === currentGame._id}
-              name={game.players[0]}
-              lastMessage={game.state}
-              lastMessageDate={game.lastMoveDate}
-              pic="https://picsum.photos/24"
-              handleClick={() => selectGame(game._id)}
-            />
-          ))}
-        {!openGames && "No open games."}
+        <div className="side-area-open-games">
+          {openGames &&
+            openGames.map((game) => (
+              <OpenGames
+                key={game._id}
+                isActive={currentGame && game._id === currentGame._id}
+                name={game.players[0]}
+                lastMessage={game.state}
+                lastMessageDate={game.lastMoveDate}
+                pic="https://picsum.photos/24"
+                handleClick={() => selectGame(game._id)}
+              />
+            ))}
+          {!openGames && "No open games."}
+        </div>
+
         {error && (
           <Alert variant="danger" onClose={clearError} dismissible>
             <Alert.Heading>An error has occured :(</Alert.Heading>
@@ -109,6 +118,16 @@ function GamePage() {
             </Spinner>
           </div>
         )}
+        <div className="side-area-bottom">
+          <h4>Start New Game</h4>
+          <button onClick={() => setShowingNewGameModal(true)}>+</button>
+        </div>
+
+        <NewGameModal
+          handleCreateGame={handleCreateGame}
+          show={showingNewGameModal}
+          onHide={() => setShowingNewGameModal(false)}
+        />
       </div>
       {currentGame && <GameBoard game={currentGame} />}
     </div>
