@@ -35,7 +35,7 @@ router.post("/login", async (req, res, next) => {
     email: user.email,
     username: user.username,
     token,
-    picture: user.picture
+    picture: user.picture,
   });
   // console.log(_.pick(user, ["_id", "name", "email"]));
   //  res
@@ -71,7 +71,7 @@ router.post("/", fileUpload.single("picture"), async (req, res, next) => {
     email: user.email,
     username: user.username,
     token,
-    picture: user.picture
+    picture: user.picture,
   });
   //res
   // .header("x-auth_token", token)
@@ -83,9 +83,10 @@ router.get("/", async (req, res, next) => {
 
   if (!foundUsers) return next(new HttpError("Users not found.", 404));
 
-  const users = foundUsers.map(user => ({
+  const users = foundUsers.map((user) => ({
+    _id: user._id,
     username: user.username,
-    picture: user.picture
+    picture: user.picture,
   }));
 
   res.send({ users: users });

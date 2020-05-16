@@ -30,6 +30,7 @@ function GamePage() {
 
   useEffect(() => {
     if (auth.username) connectToSocket(auth.username, receiveIncomingUpdate);
+    getOpenGames();
   }, [auth.username]);
 
   function receiveIncomingUpdate(err, updatedGame) {
@@ -102,7 +103,7 @@ function GamePage() {
                 handleClick={() => selectGame(game._id)}
               />
             ))}
-          {!openGames && "No open games."}
+          {(!openGames || openGames.length === 0) && "No open games."}
         </div>
 
         {error && (

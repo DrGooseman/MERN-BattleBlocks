@@ -9,15 +9,11 @@ const HttpError = require("../models/http-error");
 const { createNewGame } = require("../util/GameUtil");
 
 router.get("/", auth, async (req, res, next) => {
-  const userGames = await Chat.find({
-    users: {
-      $elemMatch: {
-        _id: req.user._id,
-        //username: req.user.username,
-      },
-    },
+  const userGames = await Game.find({
+    players: req.user._id,
   });
 
+  console.log(userGames);
   res.send({ games: userGames });
 });
 
@@ -29,11 +25,13 @@ router.post("/", auth, async (req, res, next) => {
   try {
     newGame = createNewGame(usersInGame);
   } catch (err) {
-    return next(new HttpError("Could not create game, invalid input.", 400));
+    return next(
+      new HttpError("Could not create game, invalid input. " + err, 400)
+    );
   }
 
   try {
-    newGame.save();
+    await newGame.save();
   } catch (err) {
     return next(new HttpError("Could not create game, server error.", 500));
   }
@@ -42,7 +40,16 @@ router.post("/", auth, async (req, res, next) => {
   //   res.io.to(res.socketList[user.username]).emit("updateChat", chat)
   // );
 
-  res.send({ newGame });
+  let newGameFromDatabase;
+  try {
+    newGameFromDatabase = await Game.findById(newGame._id).populate(
+      "players.player"
+    );
+  } catch (err) {
+    return next(new HttpError("Could not fetch game, server error.", 500));
+  }
+
+  res.send({ newGame: newGameFromDatabase });
 });
 
 // router.patch("/", auth, async (req, res, next) => {
