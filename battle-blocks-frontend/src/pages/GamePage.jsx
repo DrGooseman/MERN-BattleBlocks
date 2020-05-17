@@ -20,6 +20,7 @@ function GamePage() {
   const [showingNewGameModal, setShowingNewGameModal] = useState(false);
 
   function selectGame(newGameId) {
+    console.log(openGames.find((game) => game._id === newGameId));
     setCurrentGame(openGames.find((game) => game._id === newGameId));
   }
 

@@ -45,7 +45,7 @@ function GameBoard(props) {
   useEffect(() => {
     let yourNum;
     let theirNum;
-    if (game.users[0]._id === auth._id) {
+    if (game.players[0]._id === auth._id) {
       yourNum = 0;
       theirNum = 1;
     } else {
@@ -56,11 +56,17 @@ function GameBoard(props) {
     setOtherPlayerNum(theirNum);
     setYourBlocks(game.playersBlocks[yourNum]);
     setTheirBlocks(game.playersBlocks[theirNum]);
-
-    initializeBoard();
+    console.log("useEffect");
   }, [game]);
 
+  useEffect(() => {
+    console.log("initializeBoard");
+    initializeBoard();
+  }, [yourBlocks]);
+
   function initializeBoard() {
+    console.log(yourBlocks);
+    if (!yourBlocks) return;
     yourBlocks.forEach((block) => {
       if (block.position && block.power > 0)
         boardArray[block.position.y][block.position.x] = block;
@@ -95,10 +101,10 @@ function GameBoard(props) {
 
   return (
     <React.Fragment>
-      <div className="game-area">{renderGameArea()}</div>
+      <div className="game-area">{yourBlocks && renderGameArea()}</div>
       <div className="block-area">
         {/* <h3>Your Blocks</h3> */}
-        {renderBlockArea()}
+        {yourBlocks && renderBlockArea()}
       </div>
     </React.Fragment>
   );
@@ -108,7 +114,9 @@ function GameBoard(props) {
     for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 5; j++) {
         if (!boardArray[i][j])
-          elements.push(<EmptyBlock y={i} x={j} handleClick={placeBlock} />);
+          elements.push(
+            <EmptyBlock key={i + "" + j} y={i} x={j} handleClick={placeBlock} />
+          );
       }
     }
 
