@@ -45,6 +45,7 @@ function GameBoard(props) {
   useEffect(() => {
     let yourNum;
     let theirNum;
+
     if (game.players[0]._id === auth._id) {
       yourNum = 0;
       theirNum = 1;
@@ -65,7 +66,6 @@ function GameBoard(props) {
   }, [yourBlocks]);
 
   function initializeBoard() {
-    console.log(yourBlocks);
     if (!yourBlocks) return;
     yourBlocks.forEach((block) => {
       if (block.position && block.power > 0)
@@ -93,8 +93,9 @@ function GameBoard(props) {
   function placeBlock(x, y) {
     if (boardArray[y][x] && !selectedBlock) return;
 
-    boardArray[y][x] = selectedBlock;
+    //  boardArray[y][x] = selectedBlock;
     selectedBlock.position = { x, y };
+    props.handleMove(selectedBlock);
 
     setSelectedBlock(null);
   }

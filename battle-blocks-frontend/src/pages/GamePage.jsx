@@ -11,6 +11,7 @@ import { AuthContext } from "../auth-context";
 import { connectToSocket } from "../api";
 import { disconnect } from "../api";
 import NewGameModal from "../components/NewGameModal";
+import CurrentGameHeading from "./../components/CurrentGameHeading";
 
 function GamePage() {
   const auth = useContext(AuthContext);
@@ -68,6 +69,42 @@ function GamePage() {
     } catch (err) {}
   }
 
+  async function makeMove(selectedBlock) {
+    try {
+      const movedPiece = {
+        id: selectedBlock.id,
+        position: selectedBlock.position,
+      };
+      const move = { playerID: auth._id, gameID: currentGame._id, movedPiece };
+      const responseData = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/games",
+        "PATCH",
+        JSON.stringify(move),
+        {
+          "Content-Type": "application/json",
+          Authorization: auth.token,
+        }
+      );
+      console.log(responseData.game);
+      setCurrentGame(responseData.game);
+    } catch (err) {}
+  }
+
+  async function leaveGame() {
+    try {
+      const responseData = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/games/leave",
+        "PATCH",
+        JSON.stringify({ gameID: currentGame._id }),
+        {
+          "Content-Type": "application/json",
+          Authorization: auth.token,
+        }
+      );
+      setCurrentGame(null);
+    } catch (err) {}
+  }
+
   function sortGames(games) {
     games.sort((a, b) =>
       new Date(a.lastMoveDate) > new Date(b.lastMoveDate)
@@ -79,6 +116,7 @@ function GamePage() {
   }
 
   function handleCreateGame(game) {
+    console.log(game);
     setCurrentGame(game);
   }
 
@@ -91,13 +129,21 @@ function GamePage() {
           pic={process.env.REACT_APP_ASSET_URL + auth.picture}
           handleLogout={handleLogout}
         />
+
+        <CurrentGameHeading
+          game={currentGame}
+          _id={auth._id}
+          pic={process.env.REACT_APP_ASSET_URL + auth.picture}
+          handleLeave={leaveGame}
+        />
+
         <div className="side-area-open-games">
           {openGames &&
             openGames.map((game) => (
               <OpenGames
                 key={game._id}
                 isActive={currentGame && game._id === currentGame._id}
-                name={game.players[0]}
+                name={game.players[0].username}
                 lastMessage={game.state}
                 lastMessageDate={game.lastMoveDate}
                 pic="https://picsum.photos/24"
@@ -131,7 +177,7 @@ function GamePage() {
           onHide={() => setShowingNewGameModal(false)}
         />
       </div>
-      {currentGame && <GameBoard game={currentGame} />}
+      {currentGame && <GameBoard game={currentGame} handleMove={makeMove} />}
     </div>
   );
 }

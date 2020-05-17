@@ -8,7 +8,7 @@ function createNewGame(users) {
     players: users,
     playersBlocks: [player1Blocks, player2Blocks],
     previousPlayersBlocks: null,
-    lastMove: null,
+    lastMove: undefined,
     lastMoveDate: new Date(),
     turn: 0,
     state: 0,
@@ -37,10 +37,12 @@ function generateNewBlocks() {
     const directionOptions = [0, 1, 2, 3, 4, 5, 6, 7];
     for (let j = 0; j < numOfDirections; j++) {
       const randomNum = Math.floor(Math.random() * directionOptions.length);
-      const direction = directionOptions.pop(randomNum);
+      const direction = directionOptions[randomNum];
+      directionOptions.splice(randomNum, 1);
       directions[direction] = true;
     }
-    const block = { id: i, power: i, position: null, directions };
+    const block = { id: i, power: i, position: undefined, directions };
+
     blocks.push(block);
   }
   return blocks;

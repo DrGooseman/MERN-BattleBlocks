@@ -73,7 +73,7 @@ function NewGameModal(props) {
         }
       );
       setSelectedUser(null);
-      props.handleCreateGame(responseData.game);
+      props.handleCreateGame(responseData.newGame);
       props.onHide();
     } catch (err) {}
   }
