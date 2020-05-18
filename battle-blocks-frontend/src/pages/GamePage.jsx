@@ -37,6 +37,14 @@ function GamePage() {
     getOpenGames();
   }, [auth.username]);
 
+  function updateOpenGames(gameToUpdate) {
+    const newOpenGames = openGames.filter(
+      (game) => game._id !== gameToUpdate._id
+    );
+    newOpenGames.unshift(gameToUpdate);
+    setOpenGames(newOpenGames);
+  }
+
   function updateCurrentGame(game) {
     if (game.players[0]._id === auth._id) {
       setPlayerNum(0);
@@ -99,6 +107,7 @@ function GamePage() {
         }
       );
       console.log(responseData.game);
+      updateOpenGames(responseData.game);
       updateCurrentGame(responseData.game);
     } catch (err) {}
   }
@@ -129,6 +138,7 @@ function GamePage() {
           Authorization: auth.token,
         }
       );
+      updateOpenGames(responseData.game);
       updateCurrentGame(responseData.game);
     } catch (err) {}
   }

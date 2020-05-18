@@ -136,7 +136,7 @@ function GameBoard(props) {
       if (block.position && block.power > 0)
         elements.push(
           <Block
-            key={block.id}
+            key={block.id + "yours"}
             id={block.id}
             position={block.position}
             power={block.power}
@@ -149,7 +149,7 @@ function GameBoard(props) {
       if (block.position && block.power > 0)
         elements.push(
           <Block
-            key={block.id}
+            key={block.id + "theirs"}
             id={block.id}
             position={block.position}
             power={block.power}

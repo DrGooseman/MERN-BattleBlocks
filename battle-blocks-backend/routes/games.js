@@ -92,6 +92,8 @@ router.patch("/", auth, async (req, res, next) => {
 
   game.turn = !game.turn;
 
+  game.lastMoveDate = new Date();
+
   try {
     await game.save();
   } catch (err) {
