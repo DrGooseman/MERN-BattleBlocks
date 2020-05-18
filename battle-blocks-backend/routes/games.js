@@ -6,7 +6,7 @@ const router = express.Router();
 
 const fileUpload = require("../middleware/file-upload");
 const HttpError = require("../models/http-error");
-const { createNewGame } = require("../util/GameUtil");
+const { createNewGame, attackSurroundingBlocks } = require("../util/GameUtil");
 
 router.get("/", auth, async (req, res, next) => {
   let userGames;
@@ -81,14 +81,18 @@ router.patch("/", auth, async (req, res, next) => {
       return next(new HttpError("Invalid move.", 400));
   }
 
-  let playerNum;
-  if (playerID == game.players[0]._id) playerNum = 0;
-  else if (playerID == game.players[1]._id) playerNum = 1;
+  const playerNum = playerID == game.players[0]._id ? 0 : 1;
+  const otherPlayerNum = playerNum === 0 ? 1 : 0;
 
   game.previousPlayersBlocks = [...game.playersBlocks];
 
-  game.playersBlocks[playerNum][movedPiece.id - 1].position =
-    movedPiece.position;
+  const movedBlockInArray = game.playersBlocks[playerNum][movedPiece.id - 1];
+  movedBlockInArray.position = movedPiece.position;
+
+  attackSurroundingBlocks(
+    movedBlockInArray,
+    game.playersBlocks[otherPlayerNum]
+  );
 
   game.turn = !game.turn;
 

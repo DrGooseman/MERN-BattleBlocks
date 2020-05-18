@@ -48,4 +48,82 @@ function generateNewBlocks() {
   return blocks;
 }
 
+function attackSurroundingBlocks(yourBlock, theirBlocks) {
+  const grid = [[], [], [], [], []];
+
+  theirBlocks.forEach((block) => {
+    if (block.position.x) {
+      grid[block.position.y][block.position.x] = block;
+    }
+  });
+
+  if (
+    yourBlock.directions[0] &&
+    yourBlock.position.x > 0 &&
+    yourBlock.position.y > 0
+  )
+    attackBlock(
+      grid[yourBlock.position.y - 1][yourBlock.position.x - 1],
+      yourBlock.power
+    );
+  if (yourBlock.directions[1] && yourBlock.position.y > 0)
+    attackBlock(
+      grid[yourBlock.position.y - 1][yourBlock.position.x],
+      yourBlock.power
+    );
+  if (
+    yourBlock.directions[2] &&
+    yourBlock.position.x < 4 &&
+    yourBlock.position.y > 0
+  )
+    attackBlock(
+      grid[yourBlock.position.y - 1][yourBlock.position.x + 1],
+      yourBlock.power
+    );
+  if (yourBlock.directions[3] && yourBlock.position.x > 0)
+    attackBlock(
+      grid[yourBlock.position.y][yourBlock.position.x - 1],
+      yourBlock.power
+    );
+  if (yourBlock.directions[4] && yourBlock.position.x < 4)
+    attackBlock(
+      grid[yourBlock.position.y][yourBlock.position.x + 1],
+      yourBlock.power
+    );
+  if (
+    yourBlock.directions[5] &&
+    yourBlock.position.x > 0 &&
+    yourBlock.position.y < 4
+  )
+    attackBlock(
+      grid[yourBlock.position.y + 1][yourBlock.position.x - 1],
+      yourBlock.power
+    );
+  if (yourBlock.directions[6] && yourBlock.position.y < 4)
+    attackBlock(
+      grid[yourBlock.position.y + 1][yourBlock.position.x],
+      yourBlock.power
+    );
+  if (
+    yourBlock.directions[7] &&
+    yourBlock.position.x < 4 &&
+    yourBlock.position.y < 4
+  )
+    attackBlock(
+      grid[yourBlock.position.y + 1][yourBlock.position.x + 1],
+      yourBlock.power
+    );
+}
+
+function attackBlock(block, power) {
+  if (!block) return;
+
+  block.power -= power;
+  if (block.power <= 0) {
+    block.power = 0;
+    block.position = undefined;
+  }
+}
+
 exports.createNewGame = createNewGame;
+exports.attackSurroundingBlocks = attackSurroundingBlocks;

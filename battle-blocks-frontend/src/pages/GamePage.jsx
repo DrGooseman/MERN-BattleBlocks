@@ -21,6 +21,8 @@ function GamePage() {
   const [showingNewGameModal, setShowingNewGameModal] = useState(false);
   const [playerNum, setPlayerNum] = useState(0);
   const [otherPlayerNum, setOtherPlayerNum] = useState(1);
+  const [yourScore, setYourScore] = useState(0);
+  const [theirScore, setTheirScore] = useState(0);
 
   function selectGame(newGameId) {
     console.log(openGames.find((game) => game._id === newGameId));
@@ -46,14 +48,24 @@ function GamePage() {
   }
 
   function updateCurrentGame(game) {
-    if (game.players[0]._id === auth._id) {
-      setPlayerNum(0);
-      setOtherPlayerNum(1);
-    } else {
-      setPlayerNum(1);
-      setOtherPlayerNum(0);
+    let yourNum = 0;
+    let theirNum = 1;
+    if (game.players[1]._id === auth._id) {
+      yourNum = 1;
+      theirNum = 0;
     }
+    setPlayerNum(yourNum);
+    setOtherPlayerNum(theirNum);
     setCurrentGame(game);
+
+    let yourScore = 0;
+    game.playersBlocks[yourNum].forEach((block) => (yourScore += block.power));
+    setYourScore(yourScore);
+    let theirScore = 0;
+    game.playersBlocks[theirNum].forEach(
+      (block) => (theirScore += block.power)
+    );
+    setTheirScore(theirScore);
   }
 
   function receiveIncomingUpdate(err, updatedGame) {
