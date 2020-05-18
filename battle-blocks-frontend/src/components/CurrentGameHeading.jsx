@@ -1,25 +1,39 @@
 import React from "react";
 
-function getTurnText(props) {
-  if (props._id === props.game.players[0]._id) {
-    if (props.game.turn === 0) return "It's your turn.";
-    return "Waiting for opponent's move...";
-  }
-  if (props.game.turn === 1) return "It's your turn.";
-  return "Waiting for opponent's move...";
-}
-
 function CurrentGameHeading(props) {
+  const { playerNum, otherPlayerNum } = props;
+
+  function getTurnText(props) {
+    if (props.game.state === 0) {
+      if (props.game.playersState[playerNum] === 0)
+        return "Awaiting your response";
+      else return "Awaiting their response";
+    }
+
+    if (props.game.turn === playerNum) return "It's your turn.";
+    else return "Waiting for opponent's move...";
+  }
+
   return (
-    <div className={"player-heading"}>
+    <div className={"current-game-heading"}>
       {props.game && (
         <React.Fragment>
-          <img src={props.pic} alt="prof pic" />
-          <div className="player-heading-name">Jim: 0 Bob: 0</div>
-          <div className="player-heading-logout">
+          <img
+            src={
+              process.env.REACT_APP_ASSET_URL +
+              props.game.players[otherPlayerNum].picture
+            }
+            alt="prof pic"
+          />
+
+          <div className="current-game-heading-score">Jim: 0 Bob: 0</div>
+          <div className="">
             <button onClick={props.handleLeave}>Leave Game</button>
           </div>
-          <div className="player-heading-message">{getTurnText(props)}</div>
+
+          <div className="current-game-heading-message">
+            {getTurnText(props)}
+          </div>
         </React.Fragment>
       )}
     </div>

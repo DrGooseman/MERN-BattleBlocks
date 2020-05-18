@@ -315,3 +315,50 @@ html {
 .new-chat-modal-item-found {
   background-color: rgb(204, 204, 204) !important;
 }
+
+.current-game-heading {
+  background-color: #ddd;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 80px;
+  color: black;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #002c88;
+  padding: 10px 10px 10px 10px;
+}
+
+.current-game-heading > img {
+  height: 40px;
+  border-radius: 100%;
+}
+
+.current-game-heading-message {
+  grid-column: span 2;
+  padding-left: 5px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.current-game-heading-name {
+  font-weight: bold;
+  color: #eee;
+  padding-left: 5px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.current-game-heading-logout {
+  color: #ddd;
+  font-size: 1rem;
+}
+
+.game-board-message {
+  background-color: #2196f3;
+  grid-area: game-area;
+
+  text-align: center;
+  margin: auto;
+  width: 60%;
+}

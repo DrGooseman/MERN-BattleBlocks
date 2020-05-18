@@ -19,10 +19,12 @@ function GamePage() {
   const [currentGame, setCurrentGame] = useState(null);
   const [openGames, setOpenGames] = useState(null);
   const [showingNewGameModal, setShowingNewGameModal] = useState(false);
+  const [playerNum, setPlayerNum] = useState(0);
+  const [otherPlayerNum, setOtherPlayerNum] = useState(1);
 
   function selectGame(newGameId) {
     console.log(openGames.find((game) => game._id === newGameId));
-    setCurrentGame(openGames.find((game) => game._id === newGameId));
+    updateCurrentGame(openGames.find((game) => game._id === newGameId));
   }
 
   function handleLogout() {
@@ -34,6 +36,17 @@ function GamePage() {
     if (auth.username) connectToSocket(auth.username, receiveIncomingUpdate);
     getOpenGames();
   }, [auth.username]);
+
+  function updateCurrentGame(game) {
+    if (game.players[0]._id === auth._id) {
+      setPlayerNum(0);
+      setOtherPlayerNum(1);
+    } else {
+      setPlayerNum(1);
+      setOtherPlayerNum(0);
+    }
+    setCurrentGame(game);
+  }
 
   function receiveIncomingUpdate(err, updatedGame) {
     // setLastUpdatedChat(updatedChat);
@@ -86,7 +99,7 @@ function GamePage() {
         }
       );
       console.log(responseData.game);
-      setCurrentGame(responseData.game);
+      updateCurrentGame(responseData.game);
     } catch (err) {}
   }
 
@@ -105,6 +118,21 @@ function GamePage() {
     } catch (err) {}
   }
 
+  async function acceptGame() {
+    try {
+      const responseData = await sendRequest(
+        process.env.REACT_APP_BACKEND_URL + "/games/accept",
+        "PATCH",
+        JSON.stringify({ playerID: auth._id, gameID: currentGame._id }),
+        {
+          "Content-Type": "application/json",
+          Authorization: auth.token,
+        }
+      );
+      updateCurrentGame(responseData.game);
+    } catch (err) {}
+  }
+
   function sortGames(games) {
     games.sort((a, b) =>
       new Date(a.lastMoveDate) > new Date(b.lastMoveDate)
@@ -117,7 +145,7 @@ function GamePage() {
 
   function handleCreateGame(game) {
     console.log(game);
-    setCurrentGame(game);
+    updateCurrentGame(game);
   }
 
   return (
@@ -133,8 +161,9 @@ function GamePage() {
         <CurrentGameHeading
           game={currentGame}
           _id={auth._id}
-          pic={process.env.REACT_APP_ASSET_URL + auth.picture}
           handleLeave={leaveGame}
+          playerNum={playerNum}
+          otherPlayerNum={otherPlayerNum}
         />
 
         <div className="side-area-open-games">
@@ -142,11 +171,11 @@ function GamePage() {
             openGames.map((game) => (
               <OpenGames
                 key={game._id}
+                game={game}
                 isActive={currentGame && game._id === currentGame._id}
-                name={game.players[0].username}
-                lastMessage={game.state}
-                lastMessageDate={game.lastMoveDate}
-                pic="https://picsum.photos/24"
+                turn={game.turn}
+                localPlayerID={auth._id}
+                lastMoveDate={game.lastMoveDate}
                 handleClick={() => selectGame(game._id)}
               />
             ))}
@@ -177,7 +206,16 @@ function GamePage() {
           onHide={() => setShowingNewGameModal(false)}
         />
       </div>
-      {currentGame && <GameBoard game={currentGame} handleMove={makeMove} />}
+      {currentGame && (
+        <GameBoard
+          game={currentGame}
+          handleMove={makeMove}
+          playerNum={playerNum}
+          otherPlayerNum={otherPlayerNum}
+          handleDecline={leaveGame}
+          handleAccept={acceptGame}
+        />
+      )}
     </div>
   );
 }

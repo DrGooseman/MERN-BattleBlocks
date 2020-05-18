@@ -13,7 +13,7 @@ router.get("/", auth, async (req, res, next) => {
   try {
     userGames = await Game.find({
       players: req.user._id,
-    }).populate("players");
+    }).populate("players", "-password -email");
   } catch (err) {
     return next(new HttpError("Could not fetch game, server error.", 500));
   }
@@ -46,7 +46,10 @@ router.post("/", auth, async (req, res, next) => {
 
   let newGameFromDatabase;
   try {
-    newGameFromDatabase = await Game.findById(newGame._id).populate("players");
+    newGameFromDatabase = await Game.findById(newGame._id).populate(
+      "players",
+      "-password -email"
+    );
   } catch (err) {
     return next(new HttpError("Could not fetch game, server error.", 500));
   }
@@ -57,7 +60,10 @@ router.post("/", auth, async (req, res, next) => {
 router.patch("/", auth, async (req, res, next) => {
   const { gameID, playerID, movedPiece } = req.body;
 
-  const game = await Game.findById(gameID).populate("players");
+  const game = await Game.findById(gameID).populate(
+    "players",
+    "-password -email"
+  );
 
   if (!game) return next(new HttpError("No game found with this id.", 404));
 
@@ -84,6 +90,8 @@ router.patch("/", auth, async (req, res, next) => {
   game.playersBlocks[playerNum][movedPiece.id - 1].position =
     movedPiece.position;
 
+  game.turn = !game.turn;
+
   try {
     await game.save();
   } catch (err) {
@@ -104,6 +112,43 @@ router.patch("/leave/", auth, async (req, res, next) => {
   await Game.findOneAndRemove(gameID);
 
   res.send({});
+});
+
+router.patch("/accept/", auth, async (req, res, next) => {
+  const { gameID, playerID } = req.body;
+
+  const game = await Game.findById(gameID).populate(
+    "players",
+    "-password -email"
+  );
+
+  if (!game) return next(new HttpError("No game found with this id.", 404));
+
+  if (playerID !== req.user._id)
+    return next(
+      new HttpError("You are not authorized to make this move.", 403)
+    );
+
+  let playerNum;
+  if (playerID == game.players[0]._id) playerNum = 0;
+  else if (playerID == game.players[1]._id) playerNum = 1;
+
+  game.playersState[playerNum] = 1;
+
+  if (game.playersState[0] === 1 && game.playersState[1] === 1) game.state = 1;
+
+  try {
+    await game.save();
+  } catch (err) {
+    return next(new HttpError("Could not save move, server error.", 500));
+  }
+
+  // chat.users.forEach((user) => {
+  //   if (res.socketList[user.username])
+  //     res.io.to(res.socketList[user.username]).emit("updateChat", chat);
+  // });
+
+  res.send({ game });
 });
 
 module.exports = router;

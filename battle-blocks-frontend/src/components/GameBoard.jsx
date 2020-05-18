@@ -16,47 +16,29 @@ function getBlockAreaPosition(power) {
   return { x: col, y: row };
 }
 
-function mapBlocks() {
-  const elements = [];
-  for (let i = 0; i < 5; i++) {
-    for (let j = 0; j < 5; j++) {
-      elements.push(<div className="tile"></div>);
-    }
-  }
-  return elements;
-}
+// function mapBlocks() {
+//   const elements = [];
+//   for (let i = 0; i < 5; i++) {
+//     for (let j = 0; j < 5; j++) {
+//       elements.push(<div className="tile"></div>);
+//     }
+//   }
+//   return elements;
+// }
 
 function GameBoard(props) {
   const auth = useContext(AuthContext);
 
-  const { game } = props;
-  // let playerNum;
-  // let otherPlayerNum;
-  // const yourBlocks = [];
-  // const theirBlocks = [];
-  // const [currentGame, setCurrentGame] = useState(null);
+  const { game, playerNum, otherPlayerNum } = props;
+
   const [yourBlocks, setYourBlocks] = useState(null);
   const [theirBlocks, setTheirBlocks] = useState(null);
-  const [playerNum, setPlayerNum] = useState(null);
-  const [otherPlayerNum, setOtherPlayerNum] = useState(null);
   const [selectedBlock, setSelectedBlock] = useState(null);
   const boardArray = [[], [], [], [], []];
 
   useEffect(() => {
-    let yourNum;
-    let theirNum;
-
-    if (game.players[0]._id === auth._id) {
-      yourNum = 0;
-      theirNum = 1;
-    } else {
-      yourNum = 1;
-      theirNum = 0;
-    }
-    setPlayerNum(yourNum);
-    setOtherPlayerNum(theirNum);
-    setYourBlocks(game.playersBlocks[yourNum]);
-    setTheirBlocks(game.playersBlocks[theirNum]);
+    setYourBlocks(game.playersBlocks[playerNum]);
+    setTheirBlocks(game.playersBlocks[otherPlayerNum]);
     console.log("useEffect");
   }, [game]);
 
@@ -85,6 +67,8 @@ function GameBoard(props) {
   }
 
   function selectBlock(newBlockId) {
+    if (game.turn !== playerNum) return;
+
     if (selectedBlock && selectedBlock.id === newBlockId)
       setSelectedBlock(null);
     else setSelectedBlock(yourBlocks.find((block) => block.id === newBlockId));
@@ -100,9 +84,36 @@ function GameBoard(props) {
     setSelectedBlock(null);
   }
 
+  function getMessage() {
+    if (game.playersState[playerNum] === 0)
+      return (
+        <div className="game-board-message">
+          <h1>
+            {game.players[otherPlayerNum].username} has challenged you to play.
+          </h1>
+          <button onClick={props.handleAccept}>Accept</button>
+          <button onClick={props.handleDecline}>Decline</button>
+        </div>
+      );
+    else
+      return (
+        <div className="game-board-message">
+          <h1>
+            Waiting for {game.players[otherPlayerNum].username} to accept your
+            invitation.
+          </h1>
+          <button>Cancel</button>
+        </div>
+      );
+  }
+
   return (
     <React.Fragment>
-      <div className="game-area">{yourBlocks && renderGameArea()}</div>
+      {game.state !== 0 ? (
+        <div className="game-area">{yourBlocks && renderGameArea()}</div>
+      ) : (
+        getMessage()
+      )}
       <div className="block-area">
         {/* <h3>Your Blocks</h3> */}
         {yourBlocks && renderBlockArea()}
@@ -151,6 +162,8 @@ function GameBoard(props) {
   }
 
   function renderBlockArea() {
+    if (game.state === 0) return;
+
     const elements = [];
     for (let i = 0; i < 2; i++) {
       for (let j = 0; j < 5; j++) {
