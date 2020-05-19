@@ -36,6 +36,7 @@ const gameSchema = new mongoose.Schema({
   },
   lastMoveDate: Date,
   turn: Number,
+  turnNumber: Number,
   state: Number,
   playersState: [Number],
   winner: Number,

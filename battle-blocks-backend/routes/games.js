@@ -6,7 +6,11 @@ const router = express.Router();
 
 const fileUpload = require("../middleware/file-upload");
 const HttpError = require("../models/http-error");
-const { createNewGame, attackSurroundingBlocks } = require("../util/GameUtil");
+const {
+  createNewGame,
+  attackSurroundingBlocks,
+  finishGame,
+} = require("../util/GameUtil");
 
 router.get("/", auth, async (req, res, next) => {
   let userGames;
@@ -95,6 +99,9 @@ router.patch("/", auth, async (req, res, next) => {
   );
 
   game.turn = !game.turn;
+  game.turnNum++;
+
+  if (game.turnNum === 21) finishGame(game);
 
   game.lastMoveDate = new Date();
 

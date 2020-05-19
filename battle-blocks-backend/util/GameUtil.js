@@ -11,6 +11,7 @@ function createNewGame(users) {
     lastMove: undefined,
     lastMoveDate: new Date(),
     turn: 1,
+    turnNumber: 0,
     state: 0,
     playersState: [1, 0],
   });
@@ -173,5 +174,20 @@ function calcReturnDamage(block, direction) {
   return 0;
 }
 
+function finishGame(game) {
+  game.state = 2;
+  let player1Score = 0;
+  let player2Score = 0;
+  game.players[0].blocks.forEach((block) => (player1Score += block.power));
+  game.players[0].blocks.forEach((block) => (player2Score += block.power));
+  console.log(player1Score);
+  console.log(player2Score);
+  if (player1Score > player2Score) game.winner = 0;
+  else if (player2Score > player1Score) game.winner = 1;
+  else game.winner = 2;
+  console.log(game.winner);
+}
+
 exports.createNewGame = createNewGame;
 exports.attackSurroundingBlocks = attackSurroundingBlocks;
+exports.finishGame = finishGame;
