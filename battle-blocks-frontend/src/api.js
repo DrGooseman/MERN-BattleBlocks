@@ -3,9 +3,9 @@ let socket;
 
 function connectToSocket(username, cb) {
   socket = openSocket(process.env.REACT_APP_SOCKET_URL, {
-    query: `username=${username}`
+    query: `username=${username}`,
   });
-  socket.on("updateChat", chat => cb(null, chat));
+  socket.on("updateGame", (game) => cb(null, game));
 }
 
 function disconnect() {

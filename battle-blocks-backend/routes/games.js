@@ -44,9 +44,10 @@ router.post("/", auth, async (req, res, next) => {
     return next(new HttpError("Could not create game, server error.", 500));
   }
 
-  // usersInChat.forEach((user) =>
-  //   res.io.to(res.socketList[user.username]).emit("updateChat", chat)
-  // );
+  if (res.socketList[newGame.players[1].username])
+    res.io
+      .to(res.socketList[newGame.players[1].username])
+      .emit("updateGame", newGame);
 
   let newGameFromDatabase;
   try {
@@ -99,9 +100,9 @@ router.patch("/", auth, async (req, res, next) => {
   );
 
   game.turn = !game.turn;
-  game.turnNum++;
+  game.turnNumber++;
 
-  if (game.turnNum === 21) finishGame(game);
+  if (game.turnNumber === 20) finishGame(game);
 
   game.lastMoveDate = new Date();
 
@@ -111,10 +112,10 @@ router.patch("/", auth, async (req, res, next) => {
     return next(new HttpError("Could not save move, server error. ", 500));
   }
 
-  // chat.users.forEach((user) => {
-  //   if (res.socketList[user.username])
-  //     res.io.to(res.socketList[user.username]).emit("updateChat", chat);
-  // });
+  if (res.socketList[game.players[otherPlayerNum].username])
+    res.io
+      .to(res.socketList[game.players[otherPlayerNum].username])
+      .emit("updateGame", game);
 
   res.send({ game });
 });
@@ -142,9 +143,8 @@ router.patch("/accept/", auth, async (req, res, next) => {
       new HttpError("You are not authorized to make this move.", 403)
     );
 
-  let playerNum;
-  if (playerID == game.players[0]._id) playerNum = 0;
-  else if (playerID == game.players[1]._id) playerNum = 1;
+  const playerNum = playerID == game.players[0]._id ? 0 : 1;
+  const otherPlayerNum = playerNum === 0 ? 1 : 0;
 
   game.playersState[playerNum] = 1;
 
@@ -156,10 +156,10 @@ router.patch("/accept/", auth, async (req, res, next) => {
     return next(new HttpError("Could not save move, server error.", 500));
   }
 
-  // chat.users.forEach((user) => {
-  //   if (res.socketList[user.username])
-  //     res.io.to(res.socketList[user.username]).emit("updateChat", chat);
-  // });
+  if (res.socketList[game.players[otherPlayerNum].username])
+    res.io
+      .to(res.socketList[game.players[otherPlayerNum].username])
+      .emit("updateGame", game);
 
   res.send({ game });
 });

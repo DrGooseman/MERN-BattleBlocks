@@ -23,6 +23,7 @@ function GamePage() {
   const [otherPlayerNum, setOtherPlayerNum] = useState(1);
   const [yourScore, setYourScore] = useState(0);
   const [theirScore, setTheirScore] = useState(0);
+  const [lastUpdatedGame, setLastUpdatedGame] = useState();
 
   function selectGame(newGameId) {
     console.log(openGames.find((game) => game._id === newGameId));
@@ -35,6 +36,7 @@ function GamePage() {
   }
 
   useEffect(() => {
+    if (!auth.username) return;
     if (auth.username) connectToSocket(auth.username, receiveIncomingUpdate);
     getOpenGames();
   }, [auth.username]);
@@ -69,16 +71,29 @@ function GamePage() {
   }
 
   function receiveIncomingUpdate(err, updatedGame) {
-    // setLastUpdatedChat(updatedChat);
-    // setChats(prevChats => {
-    //   const newChats = [
-    //     ...prevChats.filter(chat => chat._id !== updatedChat._id),
-    //     updatedChat
-    //   ];
-    //   sortChats(newChats);
-    //   return newChats;
-    // });
+    setLastUpdatedGame(updatedGame);
+
+    setOpenGames((prevGames) => {
+      const newGames = [
+        ...prevGames.filter((game) => game._id !== updatedGame._id),
+        updatedGame,
+      ];
+      sortGames(newGames);
+      return newGames;
+    });
+    //  console.log(updatedGame);
+    // console.log("currentGame2 " + currentGame);
+    // if (updatedGame._id === currentGame._id) updateCurrentGame(updatedGame);
   }
+
+  useEffect(() => {
+    if (
+      lastUpdatedGame &&
+      currentGame &&
+      lastUpdatedGame._id === currentGame._id
+    )
+      setCurrentGame(lastUpdatedGame);
+  }, [openGames]);
 
   async function getOpenGames() {
     try {
