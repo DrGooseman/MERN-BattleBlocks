@@ -50,6 +50,7 @@ function generateNewBlocks() {
 
 function attackSurroundingBlocks(yourBlock, theirBlocks) {
   const grid = [[], [], [], [], []];
+  let returnDamage = 0;
 
   theirBlocks.forEach((block) => {
     if (block.position.x) {
@@ -57,62 +58,101 @@ function attackSurroundingBlocks(yourBlock, theirBlocks) {
     }
   });
 
-  if (
-    yourBlock.directions[0] &&
-    yourBlock.position.x > 0 &&
-    yourBlock.position.y > 0
-  )
-    attackBlock(
+  if (yourBlock.position.x > 0 && yourBlock.position.y > 0) {
+    if (yourBlock.directions[0])
+      attackBlock(
+        grid[yourBlock.position.y - 1][yourBlock.position.x - 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y - 1][yourBlock.position.x - 1],
-      yourBlock.power
+      7
     );
-  if (yourBlock.directions[1] && yourBlock.position.y > 0)
-    attackBlock(
+  }
+  if (yourBlock.position.y > 0) {
+    if (yourBlock.directions[1])
+      attackBlock(
+        grid[yourBlock.position.y - 1][yourBlock.position.x],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y - 1][yourBlock.position.x],
-      yourBlock.power
+      6
     );
-  if (
-    yourBlock.directions[2] &&
-    yourBlock.position.x < 4 &&
-    yourBlock.position.y > 0
-  )
-    attackBlock(
+  }
+  if (yourBlock.position.x < 4 && yourBlock.position.y > 0) {
+    if (yourBlock.directions[2])
+      attackBlock(
+        grid[yourBlock.position.y - 1][yourBlock.position.x + 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y - 1][yourBlock.position.x + 1],
-      yourBlock.power
+      5
     );
-  if (yourBlock.directions[3] && yourBlock.position.x > 0)
-    attackBlock(
+  }
+  if (yourBlock.position.x > 0) {
+    if (yourBlock.directions[3])
+      attackBlock(
+        grid[yourBlock.position.y][yourBlock.position.x - 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y][yourBlock.position.x - 1],
-      yourBlock.power
+      4
     );
-  if (yourBlock.directions[4] && yourBlock.position.x < 4)
-    attackBlock(
+  }
+  if (yourBlock.position.x < 4) {
+    if (yourBlock.directions[4])
+      attackBlock(
+        grid[yourBlock.position.y][yourBlock.position.x + 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y][yourBlock.position.x + 1],
-      yourBlock.power
+      3
     );
-  if (
-    yourBlock.directions[5] &&
-    yourBlock.position.x > 0 &&
-    yourBlock.position.y < 4
-  )
-    attackBlock(
+  }
+  if (yourBlock.position.x > 0 && yourBlock.position.y < 4) {
+    if (yourBlock.directions[5])
+      attackBlock(
+        grid[yourBlock.position.y + 1][yourBlock.position.x - 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y + 1][yourBlock.position.x - 1],
-      yourBlock.power
+      2
     );
-  if (yourBlock.directions[6] && yourBlock.position.y < 4)
-    attackBlock(
+  }
+  if (yourBlock.position.y < 4) {
+    if (yourBlock.directions[6])
+      attackBlock(
+        grid[yourBlock.position.y + 1][yourBlock.position.x],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y + 1][yourBlock.position.x],
-      yourBlock.power
+      1
     );
-  if (
-    yourBlock.directions[7] &&
-    yourBlock.position.x < 4 &&
-    yourBlock.position.y < 4
-  )
-    attackBlock(
+  }
+  if (yourBlock.position.x < 4 && yourBlock.position.y < 4) {
+    if (yourBlock.directions[7])
+      attackBlock(
+        grid[yourBlock.position.y + 1][yourBlock.position.x + 1],
+        yourBlock.power
+      );
+    returnDamage += calcReturnDamage(
       grid[yourBlock.position.y + 1][yourBlock.position.x + 1],
-      yourBlock.power
+      0
     );
+  }
+
+  //return damage
+  yourBlock.power -= returnDamage;
+  if (yourBlock.power <= 0) {
+    yourBlock.power = 0;
+    yourBlock.position = undefined;
+  }
 }
 
 function attackBlock(block, power) {
@@ -123,6 +163,14 @@ function attackBlock(block, power) {
     block.power = 0;
     block.position = undefined;
   }
+}
+
+function calcReturnDamage(block, direction) {
+  if (!block || block.power === 0) return 0;
+
+  if (block.directions[direction]) return block.power;
+
+  return 0;
 }
 
 exports.createNewGame = createNewGame;

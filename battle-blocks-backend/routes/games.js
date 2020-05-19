@@ -101,7 +101,7 @@ router.patch("/", auth, async (req, res, next) => {
   try {
     await game.save();
   } catch (err) {
-    return next(new HttpError("Could not save move, server error.", 500));
+    return next(new HttpError("Could not save move, server error. ", 500));
   }
 
   // chat.users.forEach((user) => {
