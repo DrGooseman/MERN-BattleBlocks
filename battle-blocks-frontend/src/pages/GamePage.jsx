@@ -186,6 +186,8 @@ function GamePage() {
           handleLeave={leaveGame}
           playerNum={playerNum}
           otherPlayerNum={otherPlayerNum}
+          yourScore={yourScore}
+          theirScore={theirScore}
         />
 
         <div className="side-area-open-games">
