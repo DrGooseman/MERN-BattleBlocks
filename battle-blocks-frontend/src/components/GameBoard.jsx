@@ -3,6 +3,7 @@ import Block from "../components/Block";
 import EmptyBlock from "./EmptyBlock";
 
 import { AuthContext } from "../auth-context";
+import GameMessage from "./GameMessage";
 
 function getBlockAreaPosition(power) {
   let row = 0;
@@ -118,6 +119,7 @@ function GameBoard(props) {
         {/* <h3>Your Blocks</h3> */}
         {yourBlocks && renderBlockArea()}
       </div>
+      {/* <GameMessage message="Hi" /> */}
     </React.Fragment>
   );
 

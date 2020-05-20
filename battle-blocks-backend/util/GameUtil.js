@@ -178,8 +178,8 @@ function finishGame(game) {
   game.state = 2;
   let player1Score = 0;
   let player2Score = 0;
-  game.players[0].blocks.forEach((block) => (player1Score += block.power));
-  game.players[0].blocks.forEach((block) => (player2Score += block.power));
+  game.playersBlocks[0].forEach((block) => (player1Score += block.power));
+  game.playersBlocks[1].forEach((block) => (player2Score += block.power));
   console.log(player1Score);
   console.log(player2Score);
   if (player1Score > player2Score) game.winner = 0;

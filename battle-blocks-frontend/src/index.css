@@ -362,3 +362,12 @@ html {
   margin: auto;
   width: 60%;
 }
+
+.game-message {
+  background-color: #2196f3;
+  grid-area: game-area;
+
+  text-align: center;
+  margin: auto;
+  width: 60%;
+}

@@ -44,11 +44,6 @@ router.post("/", auth, async (req, res, next) => {
     return next(new HttpError("Could not create game, server error.", 500));
   }
 
-  if (res.socketList[newGame.players[1].username])
-    res.io
-      .to(res.socketList[newGame.players[1].username])
-      .emit("updateGame", newGame);
-
   let newGameFromDatabase;
   try {
     newGameFromDatabase = await Game.findById(newGame._id).populate(
@@ -58,6 +53,11 @@ router.post("/", auth, async (req, res, next) => {
   } catch (err) {
     return next(new HttpError("Could not fetch game, server error.", 500));
   }
+
+  if (res.socketList[newGameFromDatabase.players[1].username])
+    res.io
+      .to(res.socketList[newGameFromDatabase.players[1].username])
+      .emit("updateGame", newGameFromDatabase);
 
   res.send({ newGame: newGameFromDatabase });
 });
@@ -121,11 +121,32 @@ router.patch("/", auth, async (req, res, next) => {
 });
 
 router.patch("/leave/", auth, async (req, res, next) => {
-  const { gameID } = req.body;
+  const { gameID, playerID } = req.body;
 
-  await Game.findOneAndRemove(gameID);
+  console.log("game id " + gameID);
 
-  res.send({});
+  const game = await Game.findById(gameID).populate(
+    "players",
+    "-password -email"
+  );
+
+  const playerNum = playerID == game.players[0]._id ? 0 : 1;
+  const otherPlayerNum = playerNum === 0 ? 1 : 0;
+
+  if (game.state === 0) {
+    try {
+      await Game.deleteOne({ _id: gameID });
+
+      if (res.socketList[game.players[otherPlayerNum].username])
+        res.io
+          .to(res.socketList[game.players[otherPlayerNum].username])
+          .emit("removeGame", gameID);
+    } catch (err) {
+      return next(new HttpError("Could not delete game, server error.", 500));
+    }
+  }
+
+  res.send({ gameID });
 });
 
 router.patch("/accept/", auth, async (req, res, next) => {

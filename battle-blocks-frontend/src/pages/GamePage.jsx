@@ -24,6 +24,7 @@ function GamePage() {
   const [yourScore, setYourScore] = useState(0);
   const [theirScore, setTheirScore] = useState(0);
   const [lastUpdatedGame, setLastUpdatedGame] = useState();
+  const [lastDeletedGameID, setLastDeletedGameID] = useState();
 
   function selectGame(newGameId) {
     console.log(openGames.find((game) => game._id === newGameId));
@@ -37,7 +38,12 @@ function GamePage() {
 
   useEffect(() => {
     if (!auth.username) return;
-    if (auth.username) connectToSocket(auth.username, receiveIncomingUpdate);
+    if (auth.username)
+      connectToSocket(
+        auth.username,
+        receiveIncomingUpdate,
+        receiveIncomingRemove
+      );
     getOpenGames();
   }, [auth.username]);
 
@@ -81,9 +87,14 @@ function GamePage() {
       sortGames(newGames);
       return newGames;
     });
-    //  console.log(updatedGame);
-    // console.log("currentGame2 " + currentGame);
-    // if (updatedGame._id === currentGame._id) updateCurrentGame(updatedGame);
+  }
+  function receiveIncomingRemove(err, removedGameID) {
+    setLastDeletedGameID(removedGameID);
+    setOpenGames((prevGames) => {
+      const newGames = prevGames.filter((game) => game._id !== removedGameID);
+      sortGames(newGames);
+      return newGames;
+    });
   }
 
   useEffect(() => {
@@ -94,6 +105,15 @@ function GamePage() {
     )
       setCurrentGame(lastUpdatedGame);
   }, [openGames]);
+
+  useEffect(() => {
+    if (
+      lastDeletedGameID &&
+      currentGame &&
+      lastDeletedGameID === currentGame._id
+    )
+      setCurrentGame(null);
+  }, [lastDeletedGameID]);
 
   async function getOpenGames() {
     try {
@@ -112,8 +132,6 @@ function GamePage() {
       sortGames(games);
 
       setOpenGames(games);
-
-      // getQuestion();
     } catch (err) {}
   }
 
@@ -144,12 +162,19 @@ function GamePage() {
       const responseData = await sendRequest(
         process.env.REACT_APP_BACKEND_URL + "/games/leave",
         "PATCH",
-        JSON.stringify({ gameID: currentGame._id }),
+        JSON.stringify({ gameID: currentGame._id, playerID: auth._id }),
         {
           "Content-Type": "application/json",
           Authorization: auth.token,
         }
       );
+      setOpenGames((prevGames) => {
+        const newGames = prevGames.filter(
+          (game) => game._id !== responseData.gameID
+        );
+        sortGames(newGames);
+        return newGames;
+      });
       setCurrentGame(null);
     } catch (err) {}
   }
@@ -182,6 +207,11 @@ function GamePage() {
 
   function handleCreateGame(game) {
     console.log(game);
+    setOpenGames((prevGames) => {
+      const newGames = [...prevGames, game];
+      sortGames(newGames);
+      return newGames;
+    });
     updateCurrentGame(game);
   }
 
