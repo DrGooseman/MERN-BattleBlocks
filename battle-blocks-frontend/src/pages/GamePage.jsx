@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import OpenGames from "../components/OpenGames";
+import OpenGame from "../components/OpenGame";
 import GameBoard from "./../components/GameBoard";
 import PlayerHeading from "../components/PlayerHeading";
 import Spinner from "react-bootstrap/Spinner";
@@ -104,6 +104,7 @@ function GamePage() {
       lastUpdatedGame._id === currentGame._id
     )
       setCurrentGame(lastUpdatedGame);
+    setLastUpdatedGame(null);
   }, [openGames]);
 
   useEffect(() => {
@@ -113,6 +114,7 @@ function GamePage() {
       lastDeletedGameID === currentGame._id
     )
       setCurrentGame(null);
+    setLastDeletedGameID(null);
   }, [lastDeletedGameID]);
 
   async function getOpenGames() {
@@ -238,13 +240,11 @@ function GamePage() {
         <div className="side-area-open-games">
           {openGames &&
             openGames.map((game) => (
-              <OpenGames
+              <OpenGame
                 key={game._id}
                 game={game}
                 isActive={currentGame && game._id === currentGame._id}
-                turn={game.turn}
                 localPlayerID={auth._id}
-                lastMoveDate={game.lastMoveDate}
                 handleClick={() => selectGame(game._id)}
               />
             ))}

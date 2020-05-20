@@ -85,41 +85,24 @@ function GameBoard(props) {
     setSelectedBlock(null);
   }
 
-  function getMessage() {
-    if (game.playersState[playerNum] === 0)
-      return (
-        <div className="game-board-message">
-          <h1>
-            {game.players[otherPlayerNum].username} has challenged you to play.
-          </h1>
-          <button onClick={props.handleAccept}>Accept</button>
-          <button onClick={props.handleDecline}>Decline</button>
-        </div>
-      );
-    else
-      return (
-        <div className="game-board-message">
-          <h1>
-            Waiting for {game.players[otherPlayerNum].username} to accept your
-            invitation.
-          </h1>
-          <button>Cancel</button>
-        </div>
-      );
-  }
-
   return (
     <React.Fragment>
       {game.state !== 0 ? (
         <div className="game-area">{yourBlocks && renderGameArea()}</div>
       ) : (
-        getMessage()
+        ""
       )}
       <div className="block-area">
         {/* <h3>Your Blocks</h3> */}
         {yourBlocks && renderBlockArea()}
       </div>
-      {/* <GameMessage message="Hi" /> */}
+      <GameMessage
+        game={game}
+        handleAccept={props.handleAccept}
+        handleDecline={props.handleDecline}
+        playerNum={playerNum}
+        otherPlayerNum={otherPlayerNum}
+      />
     </React.Fragment>
   );
 

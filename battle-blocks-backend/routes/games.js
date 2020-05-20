@@ -22,7 +22,12 @@ router.get("/", auth, async (req, res, next) => {
     return next(new HttpError("Could not fetch game, server error.", 500));
   }
 
-  res.send({ games: userGames });
+  const openGames = userGames.filter((game) => {
+    const playerNum = req.user._id == game.players[0]._id ? 0 : 1;
+    return game.playersState[playerNum] !== 2;
+  });
+
+  res.send({ games: openGames });
 });
 
 router.post("/", auth, async (req, res, next) => {
@@ -144,6 +149,25 @@ router.patch("/leave/", auth, async (req, res, next) => {
     } catch (err) {
       return next(new HttpError("Could not delete game, server error.", 500));
     }
+  } else if (game.state === 1) {
+    game.playersState.set(playerNum, 2);
+    game.winner = otherPlayerNum;
+    game.state = 3;
+
+    if (res.socketList[game.players[otherPlayerNum].username])
+      res.io
+        .to(res.socketList[game.players[otherPlayerNum].username])
+        .emit("updateGame", game);
+  } else if (game.state === 2 || game.state === 3) {
+    game.playersState.set(playerNum, 2);
+  }
+
+  if (game.state !== 0) {
+    try {
+      await game.save();
+    } catch (err) {
+      return next(new HttpError("Could not leave game, server error.", 500));
+    }
   }
 
   res.send({ gameID });
@@ -167,7 +191,7 @@ router.patch("/accept/", auth, async (req, res, next) => {
   const playerNum = playerID == game.players[0]._id ? 0 : 1;
   const otherPlayerNum = playerNum === 0 ? 1 : 0;
 
-  game.playersState[playerNum] = 1;
+  game.playersState.set(playerNum, 1);
 
   if (game.playersState[0] === 1 && game.playersState[1] === 1) game.state = 1;
 

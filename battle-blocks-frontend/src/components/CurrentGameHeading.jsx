@@ -9,6 +9,9 @@ function CurrentGameHeading(props) {
       else return "Awaiting their response";
     }
 
+    if (game.state === 3)
+      return game.players[otherPlayerNum].username + " left!";
+
     if (game.turn === playerNum) return "It's your turn.";
     else return "Waiting for opponent's move...";
   }
