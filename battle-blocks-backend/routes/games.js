@@ -27,7 +27,17 @@ router.get("/", auth, async (req, res, next) => {
     return game.playersState[playerNum] !== 2;
   });
 
-  res.send({ games: openGames });
+  let wins = 0;
+  let losses = 0;
+  let draws = 0;
+  userGames.forEach((game) => {
+    const playerNum = req.user._id == game.players[0]._id ? 0 : 1;
+    if (game.winner === playerNum) wins++;
+    else if (game.winner === 2) draws++;
+    else losses++;
+  });
+
+  res.send({ games: openGames, playerRecord: { wins, losses, draws } });
 });
 
 router.post("/", auth, async (req, res, next) => {

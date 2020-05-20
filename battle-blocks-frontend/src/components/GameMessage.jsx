@@ -28,13 +28,13 @@ function GameMessage(props) {
         );
     } else if (game.state === 1 && game.turn !== playerNum) {
       return (
-        <div className="game-message">
-          <h1>{game.players[otherPlayerNum].username}'s' turn...</h1>
+        <div className="game-message-small">
+          <h1>{game.players[otherPlayerNum].username}'s turn...</h1>
         </div>
       );
     } else if (game.state === 2) {
       return (
-        <div className="game-message">
+        <div className="game-message-small">
           <h1>
             {game.winner === playerNum ? "You won! Congrats!" : "You lost :("}
           </h1>

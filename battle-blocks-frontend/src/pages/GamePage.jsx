@@ -25,6 +25,11 @@ function GamePage() {
   const [theirScore, setTheirScore] = useState(0);
   const [lastUpdatedGame, setLastUpdatedGame] = useState();
   const [lastDeletedGameID, setLastDeletedGameID] = useState();
+  const [playerRecord, setPlayerRecord] = useState({
+    wins: 0,
+    losses: 0,
+    draws: 0,
+  });
 
   function selectGame(newGameId) {
     console.log(openGames.find((game) => game._id === newGameId));
@@ -134,6 +139,7 @@ function GamePage() {
       sortGames(games);
 
       setOpenGames(games);
+      setPlayerRecord(responseData.playerRecord);
     } catch (err) {}
   }
 
@@ -225,6 +231,7 @@ function GamePage() {
           username={auth.username}
           pic={process.env.REACT_APP_ASSET_URL + auth.picture}
           handleLogout={handleLogout}
+          playerRecord={playerRecord}
         />
 
         <CurrentGameHeading

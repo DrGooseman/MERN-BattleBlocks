@@ -68,7 +68,7 @@ function GameBoard(props) {
   }
 
   function selectBlock(newBlockId) {
-    if (game.turn !== playerNum) return;
+    if (game.turn !== playerNum || game.state !== 1) return;
 
     if (selectedBlock && selectedBlock.id === newBlockId)
       setSelectedBlock(null);
@@ -76,7 +76,7 @@ function GameBoard(props) {
   }
 
   function placeBlock(x, y) {
-    if (boardArray[y][x] && !selectedBlock) return;
+    if (boardArray[y][x] || !selectedBlock) return;
 
     //  boardArray[y][x] = selectedBlock;
     selectedBlock.position = { x, y };
@@ -127,6 +127,7 @@ function GameBoard(props) {
             power={block.power}
             directions={block.directions}
             owner="yours"
+            handleClick={() => {}}
           />
         );
     });
@@ -140,6 +141,7 @@ function GameBoard(props) {
             power={block.power}
             directions={block.directions}
             owner="theirs"
+            handleClick={() => {}}
           />
         );
     });

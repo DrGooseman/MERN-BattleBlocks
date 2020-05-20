@@ -9,6 +9,9 @@ function CurrentGameHeading(props) {
       else return "Awaiting their response";
     }
 
+    if (game.state === 2)
+      return game.winner === playerNum ? "You won! Congrats!" : "You lost :(";
+
     if (game.state === 3)
       return game.players[otherPlayerNum].username + " left!";
 
@@ -34,9 +37,8 @@ function CurrentGameHeading(props) {
               {game.players[otherPlayerNum].username}: {theirScore}
             </p>
           </div>
-          <div className="">
-            <button onClick={props.handleLeave}>Leave Game</button>
-          </div>
+
+          <button onClick={props.handleLeave}>Leave Game</button>
 
           <div className="current-game-heading-message">
             {getTurnText(props)}
