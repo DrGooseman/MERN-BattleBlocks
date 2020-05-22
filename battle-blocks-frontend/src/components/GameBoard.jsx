@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import Block from "../components/Block";
 import EmptyBlock from "./EmptyBlock";
 
-import { AuthContext } from "../auth-context";
 import GameMessage from "./GameMessage";
 
 function getBlockAreaPosition(power) {
@@ -28,8 +27,6 @@ function getBlockAreaPosition(power) {
 // }
 
 function GameBoard(props) {
-  const auth = useContext(AuthContext);
-
   const { game, playerNum, otherPlayerNum } = props;
 
   const [yourBlocks, setYourBlocks] = useState(null);
@@ -40,11 +37,9 @@ function GameBoard(props) {
   useEffect(() => {
     setYourBlocks(game.playersBlocks[playerNum]);
     setTheirBlocks(game.playersBlocks[otherPlayerNum]);
-    console.log("useEffect");
   }, [game]);
 
   useEffect(() => {
-    console.log("initializeBoard");
     initializeBoard();
   }, [yourBlocks]);
 
@@ -58,13 +53,6 @@ function GameBoard(props) {
       if (block.position && block.power > 0)
         boardArray[block.position.y][block.position.x] = block;
     });
-
-    // for (var i = 0; i < 5; i++){
-    //     for (var j = 0; j < 5; j++){
-    //         if (!boardArray[i][j])
-    //         boardArray[i][j]
-    //     }
-    // }
   }
 
   function selectBlock(newBlockId) {

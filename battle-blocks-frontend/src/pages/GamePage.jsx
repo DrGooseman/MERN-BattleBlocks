@@ -32,7 +32,6 @@ function GamePage() {
   });
 
   function selectGame(newGameId) {
-    console.log(openGames.find((game) => game._id === newGameId));
     updateCurrentGame(openGames.find((game) => game._id === newGameId));
   }
 
@@ -159,7 +158,6 @@ function GamePage() {
           Authorization: auth.token,
         }
       );
-      console.log(responseData.game);
       updateOpenGames(responseData.game);
       updateCurrentGame(responseData.game);
     } catch (err) {}
@@ -214,7 +212,6 @@ function GamePage() {
   }
 
   function handleCreateGame(game) {
-    console.log(game);
     setOpenGames((prevGames) => {
       const newGames = [...prevGames, game];
       sortGames(newGames);
